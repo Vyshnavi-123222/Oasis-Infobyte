@@ -1,0 +1,60 @@
+import speech_recognition as sr
+import pyttsx3
+import datetime
+
+# Initialize the recognizer and TTS engine
+recognizer = sr.Recognizer()
+engine = pyttsx3.init()
+
+# Set voice parameters (rate, volume, etc.)
+engine.setProperty('rate', 150)
+engine.setProperty('volume', 1.0)
+
+# Function for text-to-speech
+def speak(text):
+    engine.say(text)
+    engine.runAndWait()
+
+# Function to listen and recognize speech
+def listen_command():
+    with sr.Microphone() as source:
+        print("Listening...")
+        recognizer.adjust_for_ambient_noise(source)
+        audio = recognizer.listen(source)
+        command = ""
+        
+        try:
+            command = recognizer.recognize_google(audio).lower()
+            print(f"You said: {command}")
+        except sr.UnknownValueError:
+            print("Sorry, I could not understand your speech.")
+            speak("Sorry, I could not understand your speech.")
+        except sr.RequestError:
+            print("Sorry, the speech recognition service is unavailable.")
+            speak("Sorry, the speech recognition service is unavailable.")
+        return command
+
+# Function to perform actions based on the command
+def perform_task(command):
+    if 'time' in command:
+        current_time = datetime.datetime.now().strftime("%I:%M %p")
+        speak(f"The time is {current_time}")
+        print(f"The time is {current_time}")
+    elif 'hello' in command:
+        speak("Hello! How can I assist you today?")
+        print("Hello! How can I assist you today?")
+    elif 'exit' in command or 'stop' in command:
+        speak("Goodbye!")
+        print("Goodbye!")
+        exit(0)
+    else:
+        speak("I didn't understand the command. Please try again.")
+        print("I didn't understand the command. Please try again.")
+
+# Main loop to keep the assistant running
+if _name_ == "_main_":
+    speak("Voice assistant activated. How can I help you?")
+    while True:
+        user_command = listen_command()
+        if user_command:
+            perform_task(user_command)
